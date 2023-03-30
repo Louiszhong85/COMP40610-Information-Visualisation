@@ -1,0 +1,164 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Video Game Sales Explorer",
+    "fontSize": 24,
+    "fontWeight": "bold",
+    "anchor": "middle"
+  },
+  "data": {
+    "url": "https://raw.githubusercontent.com/colmr/vis_class/master/video_games.csv"
+  },
+  "description": "Please use event.shiftKey to multy select ,thanks",
+  "transform": [{"filter": "datum.EU_Sales > 0"}],
+  "vconcat": [
+    {
+      "hconcat": [
+        {
+          "width": 600,
+          "height": 450,
+          "params": [
+            {
+              "name": "platform_select",
+              "select": {"type": "point", "fields": ["Platform"]},
+              "bind": {"legend": "Platform"}
+            }
+          ],
+          "selection": {
+            "sale_range": {"type": "interval", "encodings": ["x", "y"]},
+            "genre": {
+              "type": "multi",
+              "fields": ["Genre"],
+              "toggle": "event.shiftKey"
+            },
+            "platform_select": {
+              "type": "multi",
+              "fields": ["Platform"],
+              "bind": "legend"
+            }
+          },
+          "mark": "circle",
+          "transform": [
+            {"filter": {"selection": "genre"}},
+            {"filter": {"selection": "year_range"}}
+          ],
+          "encoding": {
+            "x": {
+              "field": "EU_Sales",
+              "type": "quantitative",
+              "axis": {"title": "EU Sales (Millions)", "titleFontSize": 20},
+              "scale": {
+                "type": "log",
+                "base": 10,
+                "domainMin": 0.005,
+                "domainMax": 50
+              }
+            },
+            "y": {
+              "field": "Global_Sales",
+              "type": "quantitative",
+              "axis": {"title": "Global Sales (Millions)", "titleFontSize": 20},
+              "scale": {
+                "type": "log",
+                "base": 10,
+                "domainMin": 0.005,
+                "domainMax": 100
+              }
+            },
+            "color": {
+              "condition": {
+                "selection": "sale_range",
+                "field": "Platform",
+                "type": "nominal",
+                "legend": {"titleFontSize": 20, "symbolSize": 200}
+              },
+              "value": "lightgray"
+            },
+            "opacity": {
+              "condition": {"param": "platform_select", "value": 1},
+              "value": 0
+            },
+            "tooltip": {"field": "Name", "type": "nominal"}
+          }
+        },
+        {
+          "width": 150,
+          "height": 450,
+          "mark": "bar",
+          "transform": [
+            {"filter": {"selection": "sale_range"}},
+            {"filter": {"selection": "year_range"}},
+            {"filter": {"selection": "platform_select"}}
+          ],
+          "encoding": {
+            "y": {
+              "field": "Genre",
+              "type": "nominal",
+              "axis": {"title": ""},
+              "sort": {
+                "op": "count",
+                "field": "Platform",
+                "order": "descending"
+              }
+            },
+            "x": {
+              "aggregate": "count",
+              "field": "Platform",
+              "type": "quantitative",
+              "axis": {"title": "# Games", "titleFontSize": 20}
+            },
+            "color": {
+              "condition": {
+                "selection": "genre",
+                "field": "Platform",
+                "type": "nominal"
+              },
+              "value": "lightgray"
+            }
+          },
+          "selection": {
+            "genre": {
+              "type": "multi",
+              "fields": ["Genre"],
+              "toggle": "event.shiftKey"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "width": 850,
+      "height": 150,
+      "mark": "bar",
+      "encoding": {
+        "x": {
+          "field": "Year",
+          "type": "temporal",
+          "timeUnit": "year",
+          "axis": {"title": "Year", "titleFontSize": 20},
+          "scale": {"domain": [{"year": 2006}, {"year": 2017}]}
+        },
+        "y": {
+          "aggregate": "count",
+          "type": "quantitative",
+          "axis": {"title": "# Games", "titleFontSize": 20}
+        },
+        "color": {
+          "condition": {
+            "selection": "year_range",
+            "field": "Platform",
+            "type": "nominal"
+          },
+          "value": "lightgray"
+        }
+      },
+      "transform": [
+        {"filter": {"selection": "genre"}},
+        {"filter": {"selection": "sale_range"}},
+        {"filter": {"selection": "platform_select"}}
+      ],
+      "selection": {"year_range": {"type": "interval", "encodings": ["x"]}}
+    }
+  ],
+  "config": {"view": {"stroke": "transparent"}, "axis": {"domainWidth": 1}}
+}
