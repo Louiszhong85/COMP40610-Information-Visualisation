@@ -1,0 +1,404 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Global UFO Sightings",
+    "fontSize": 24,
+    "fontWeight": "bold",
+    "anchor": "middle"
+  },
+  "data": {
+    "name": "dataset",
+    "url": "https://raw.githubusercontent.com/Louiszhong85/tidytuesday-2019/main/test_data.csv"
+  },
+  "transform": [
+    {"filter": "datum.encounter_length > 0"},
+    {"filter": "year(datum.date_time) > 0"}
+  ],
+  "vconcat": [
+    {
+      "selection": {
+        "ufo_shape_selection": {
+          "type": "multi",
+          "fields": ["ufo_shape"],
+          "bind": "legend",
+          "toggle": true
+        }
+      },
+      "hconcat": [
+        {
+          "vconcat": [
+            {
+              "params": [
+                {
+                  "name": "ufo_selection",
+                  "select": {"type": "point", "fields": ["ufo_shape"]},
+                  "bind": {"legend": "ufo_shape"}
+                }
+              ],
+              "height": 300,
+              "width": 100,
+              "mark": {"type": "bar", "cursor": "pointer"},
+              "transform": [
+                {"filter": "datum.country !== 'US'"},
+                {"filter": {"selection": "ufo_shape_selection"}},
+                {"filter": {"selection": "year_selection"}},
+                {"filter": "datum.ufo_shape !== null && datum.state !== null"}
+              ],
+              "selection": {
+                "global_selection": {
+                  "type": "multi",
+                  "fields": ["state"],
+                  "on": "click",
+                  "toggle": "event.shiftKey"
+                },
+                "ufo_shape_selection": {
+                  "type": "multi",
+                  "fields": ["ufo_shape"],
+                  "bind": "legend",
+                  "toggle": true
+                }
+              },
+              "encoding": {
+                "x": {
+                  "axis": {"title": "Number of sightings", "titleFontSize": 15},
+                  "aggregate": "count",
+                  "field": "ufo_shape",
+                  "type": "quantitative"
+                },
+                "y": {
+                  "field": "state",
+                  "title": "Global [ Exclude US ]",
+                  "axis": {"titleFontSize": 15},
+                  "sort": {
+                    "op": "count",
+                    "field": "ufo_shape",
+                    "order": "descending"
+                  }
+                },
+                "color": {
+                  "condition": {
+                    "selection": "global_selection",
+                    "field": "ufo_shape",
+                    "type": "nominal",
+                    "scale": {
+                      "domain": [
+                        "changing",
+                        "chevron",
+                        "cigar",
+                        "circle",
+                        "cone",
+                        "cross",
+                        "cylinder",
+                        "delta",
+                        "diamond",
+                        "disk",
+                        "dome",
+                        "egg",
+                        "fireball",
+                        "flash",
+                        "formation",
+                        "light",
+                        "other",
+                        "oval",
+                        "rectangle",
+                        "sphere",
+                        "teardrop",
+                        "triangle",
+                        "unknown"
+                      ]
+                    },
+                    "legend": {
+                      "title": "UFO Shape",
+                      "type": "symbol",
+                      "orient": "right",
+                      "titleFontSize": 15,
+                      "symbolSize": 150
+                    }
+                  },
+                  "value": "lightgray"
+                },
+                "opacity": {
+                  "condition": [
+                    {"selection": "ufo_shape_selection", "value": 1},
+                    {"selection": "global_selection", "value": 1}
+                  ],
+                  "value": 0.001
+                },
+                "tooltip": [
+                  {
+                    "title": "Number of sightings",
+                    "aggregate": "count",
+                    "field": "ufo_shape",
+                    "type": "quantitative"
+                  },
+                  {
+                    "title": "UFO Shape",
+                    "field": "ufo_shape",
+                    "type": "nominal"
+                  }
+                ]
+              }
+            },
+            {
+              "height": 300,
+              "width": 100,
+              "mark": {
+                "type": "bar",
+                "cursor": "pointer",
+                "on": [
+                  {
+                    "trigger": "click",
+                    "modify": "bar_selection",
+                    "values": "datum.state"
+                  }
+                ]
+              },
+              "transform": [
+                {"filter": "datum.country == 'US'"},
+                {"filter": "datum.us_region !== ''"},
+                {"filter": {"selection": "ufo_shape_selection"}},
+                {"filter": {"selection": "year_selection"}},
+                {
+                  "filter": "datum.ufo_shape !== null && datum.us_region !== null"
+                }
+              ],
+              "selection": {
+                "us_selection": {
+                  "type": "multi",
+                  "fields": ["us_region"],
+                  "on": "click",
+                  "toggle": "event.shiftKey"
+                },
+                "ufo_shape_selection": {
+                  "type": "multi",
+                  "fields": ["ufo_shape"],
+                  "bind": "legend",
+                  "toggle": true
+                }
+              },
+              "encoding": {
+                "x": {
+                  "axis": {"title": "Number of sightings", "titleFontSize": 15},
+                  "aggregate": "count",
+                  "field": "ufo_shape",
+                  "type": "quantitative"
+                },
+                "y": {
+                  "field": "us_region",
+                  "type": "nominal",
+                  "axis": {"title": "US Region", "titleFontSize": 15},
+                  "sort": {
+                    "op": "count",
+                    "field": "ufo_shape",
+                    "order": "descending"
+                  }
+                },
+                "color": {
+                  "condition": {
+                    "selection": "us_selection",
+                    "field": "ufo_shape",
+                    "type": "nominal",
+                    "scale": {
+                      "domain": [
+                        "changing",
+                        "chevron",
+                        "cigar",
+                        "circle",
+                        "cone",
+                        "cross",
+                        "cylinder",
+                        "delta",
+                        "diamond",
+                        "disk",
+                        "dome",
+                        "egg",
+                        "fireball",
+                        "flash",
+                        "formation",
+                        "light",
+                        "other",
+                        "oval",
+                        "rectangle",
+                        "sphere",
+                        "teardrop",
+                        "triangle",
+                        "unknown"
+                      ]
+                    }
+                  },
+                  "value": "lightgray"
+                },
+                "opacity": {
+                  "condition": [
+                    {"selection": "ufo_shape_selection", "value": 1},
+                    {"selection": "us_selection", "value": 1}
+                  ],
+                  "value": 0.001
+                },
+                "tooltip": [
+                  {
+                    "title": "Number of sightings",
+                    "aggregate": "count",
+                    "field": "ufo_shape",
+                    "type": "quantitative"
+                  },
+                  {
+                    "title": "UFO Shape",
+                    "field": "ufo_shape",
+                    "type": "nominal"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "layer": [
+            {
+              "data": {
+                "url": "https://raw.githubusercontent.com/Louiszhong85/tidytuesday-2019/main/world_no_antarctica.geo.json",
+                "format": {"type": "json", "property": "features"}
+              },
+              "width": 950,
+              "height": 650,
+              "mark": {
+                "type": "geoshape",
+                "fill": "lightgray",
+                "stroke": "gray"
+              }
+            },
+            {
+              "transform": [
+                {"filter": {"selection": "global_selection"}},
+                {"filter": {"selection": "us_selection"}},
+                {"filter": {"selection": "year_selection"}}
+              ],
+              "data": {"name": "dataset"},
+              "width": 950,
+              "height": 650,
+              "mark": {"type": "circle", "cursor": "pointer"},
+              "encoding": {
+                "size": {
+                  "field": "encounter_length",
+                  "type": "quantitative",
+                  "scale": {
+                    "type": "threshold",
+                    "domain": [60, 1800, 3600],
+                    "range": [25, 50, 75, 100]
+                  }
+                },
+                "longitude": {"field": "longitude", "type": "quantitative"},
+                "latitude": {"field": "latitude", "type": "quantitative"},
+                "color": {
+                  "field": "ufo_shape",
+                  "type": "nominal",
+                  "scale": {"scheme": "category20"}
+                },
+                "opacity": {
+                  "condition": {
+                    "selection": "ufo_shape_selection",
+                    "value": 0.75
+                  },
+                  "value": 0.001
+                },
+                "tooltip": [
+                  {"field": "country", "type": "nominal"},
+                  {"field": "state", "type": "nominal"},
+                  {"field": "encounter_length", "type": "quantitative"},
+                  {
+                    "field": "description",
+                    "type": "nominal",
+                    "title": "Description"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "transform": [
+        {"filter": {"selection": "global_selection"}},
+        {"filter": {"selection": "us_selection"}},
+        {"filter": {"selection": "ufo_shape_selection"}}
+      ],
+      "selection": {"year_selection": {"type": "interval", "encodings": ["x"]}},
+      "height": 100,
+      "width": 1100,
+      "mark": {"type": "bar", "cursor": "pointer"},
+      "encoding": {
+        "x": {
+          "axis": {"title": "Year", "titleFontSize": 15},
+          "field": "date_time",
+          "type": "temporal",
+          "timeUnit": "year",
+          "sort": "descending"
+        },
+        "y": {
+          "axis": {"title": "Number of sightings", "titleFontSize": 15},
+          "aggregate": "count",
+          "type": "quantitative"
+        },
+        "color": {
+          "condition": {
+            "selection": "year_selection",
+            "field": "ufo_shape",
+            "type": "nominal",
+            "scale": {
+              "domain": [
+                "changing",
+                "chevron",
+                "cigar",
+                "circle",
+                "cone",
+                "cross",
+                "cylinder",
+                "delta",
+                "diamond",
+                "disk",
+                "dome",
+                "egg",
+                "fireball",
+                "flash",
+                "formation",
+                "light",
+                "other",
+                "oval",
+                "rectangle",
+                "sphere",
+                "teardrop",
+                "triangle",
+                "unknown"
+              ]
+            }
+          },
+          "value": "lightgray"
+        }
+      },
+      "opacity": {
+        "condition": {"selection": "ufo_shape_selection", "value": 1},
+        "value": 0.5
+      },
+      "tooltip": [
+        {
+          "title": "Year",
+          "field": "date_time",
+          "type": "temporal",
+          "timeUnit": "year"
+        },
+        {
+          "title": "Number of sightings",
+          "aggregate": "count",
+          "field": "ufo_shape",
+          "type": "quantitative"
+        },
+        {"title": "UFO Shape", "field": "ufo_shape", "type": "nominal"}
+      ]
+    }
+  ],
+  "config": {
+    "mark": {"tooltip": {"content": "data"}},
+    "view": {"continuousWidth": 600, "continuousHeight": 300}
+  }
+}
